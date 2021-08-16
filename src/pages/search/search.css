@@ -1,0 +1,28 @@
+.search-w{
+  width: 900px;
+  margin: 0 auto;
+}
+.flex{
+  display: flex;
+  align-items: center;
+}
+.icon-w{
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  margin-right: 15px;
+  cursor: pointer;
+  background: url("https://s2.music.126.net/style/web2/img/table.png") no-repeat;
+}
+.play-btn{
+  background-position: 0 -103px;
+}
+.play-btn:hover{
+   background-position: 0 -128px;
+ }
+.icon-download{
+  background-position: -81px -174px;
+}
+.icon-download:hover{
+  background-position: -104px -174px;
+}

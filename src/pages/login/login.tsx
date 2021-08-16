@@ -1,9 +1,18 @@
 import React from "react";
-import { Form, Input, Button, Checkbox } from 'antd';
+import { Form, Input, Button } from 'antd';
 
-export default function LoginPage() {
+import './login.css'
+import loginIcon from './login-icon.png'
+import {LoginService} from "../../api/login";
+
+export default function LoginPage(props: { history: string[]; }) {
   const onFinish = (values: any) => {
     console.log('Success:', values);
+    LoginService.login(values).then(res => {
+      localStorage.setItem('wy-auth-info', JSON.stringify(res.data))
+      localStorage.setItem('wy-auth-cookie', res.data.cookie)
+      props.history.push('/search')
+    })
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -11,68 +20,55 @@ export default function LoginPage() {
   };
 
   return (
-    <Form
-      name="basic"
-      labelCol={{
-        span: 4,
-      }}
-      wrapperCol={{
-        span: 16,
-      }}
-      initialValues={{
-        remember: true,
-      }}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-    >
-      <Form.Item
-        label="Username"
-        name="username"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your username!',
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-
-      <Form.Item
-        label="Password"
-        name="password"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your password!',
-          },
-        ]}
-      >
-        <Input.Password />
-      </Form.Item>
-
-      <Form.Item
-        name="remember"
-        valuePropName="checked"
+    <div className="login-w">
+      <img src={loginIcon} alt="login icon" className="top"/>
+      <Form
+        name="basic"
+        labelCol={{
+          span: 6,
+        }}
         wrapperCol={{
-          offset: 8,
           span: 16,
         }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
       >
-        <Checkbox>Remember me</Checkbox>
-      </Form.Item>
+        <Form.Item
+          label="用户名"
+          name="email"
+          rules={[
+            {
+              required: true,
+              message: '轻输入邮箱/手机号',
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
 
-      <Form.Item
-        wrapperCol={{
-          offset: 8,
-          span: 16,
-        }}
-      >
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item
+          label="密码"
+          name="password"
+          rules={[
+            {
+              required: true,
+              message: '请输入密码',
+            },
+          ]}
+        >
+          <Input.Password />
+        </Form.Item>
+
+        <Form.Item
+          wrapperCol={{
+            offset: 8,
+            span: 16,
+          }}
+        >
+          <Button type="primary" htmlType="submit">登录</Button>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 
