@@ -5,13 +5,12 @@ import './login.css'
 import loginIcon from './login-icon.png'
 import {LoginService} from "../../api/login";
 
-export default function LoginPage(props: { history: string[]; }) {
+export default function LoginPage(props: { history: string[]; cb:string }) {
   const onFinish = (values: any) => {
-    console.log('Success:', values);
     LoginService.login(values).then(res => {
       localStorage.setItem('wy-auth-info', JSON.stringify(res.data))
       localStorage.setItem('wy-auth-cookie', res.data.cookie)
-      props.history.push('/search')
+      props.cb ? props.history.push(props.cb) : props.history.push('/')
     })
   };
 

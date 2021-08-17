@@ -1,9 +1,10 @@
 import React, { Component } from "react";
+import {withRouter} from 'react-router-dom'
 import TopIcon from "./top-icon.png";
-import {Button} from "antd";
+import {Button, message} from "antd";
 import './layout.css'
 
-export default class LayoutTop extends Component<any, any>{
+class LayoutTop extends Component<any, any>{
   constructor(props: any) {
     super(props)
     this.state = {
@@ -23,7 +24,17 @@ export default class LayoutTop extends Component<any, any>{
   }
 
   toLogin(): void {
-    this.props.history.push('/login')
+    if (this.state.userName) {
+      localStorage.removeItem('wy-auth-cookie')
+      localStorage.removeItem('wy-auth-info')
+      message.info('退出成功')
+      this.setState({
+        userInfo: {},
+        userName: ''
+      })
+    } else {
+      this.props.history.push('/login')
+    }
   }
 
   render() {
@@ -31,10 +42,13 @@ export default class LayoutTop extends Component<any, any>{
       <div className="layout-top">
         <img src={TopIcon} alt="top icon" className="top-icon"/>
         <span className="txt">网易云音乐试听下载</span>
-        {
-          this.state.userName ? <span className="txt">{this.state.userName}</span> : <Button type={'primary'} onClick={() => this.toLogin}>登录</Button>
-        }
+        <div>
+          <span className="txt m-r-10">{this.state.userName || ''}</span>
+          <Button type={'primary'} onClick={() => this.toLogin()}>{this.state.userName ? '退出' : '登录'}</Button>
+        </div>
       </div>
     )
   }
 }
+
+export default withRouter(LayoutTop)

@@ -8,7 +8,11 @@
 .top-icon{
   width: 30px;
   height: 30px;
+  border-radius: 6px;
 }
 .layout-top .txt{
   color: #FFF;
+}
+.m-r-10{
+  margin-right: 10px;
 }

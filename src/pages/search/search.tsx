@@ -1,5 +1,5 @@
 import React, { useState, Fragment } from "react";
-import { Input, Table, message, Button } from 'antd';
+import { Input, Table, message, Spin } from 'antd';
 import {SearchService} from "../../api/search";
 import './search.css';
 import { SearchParams, arInterface } from "../../api/types";
@@ -15,18 +15,19 @@ export function SearchPage(props: any) {
   const [dataSource, setDataSource] = useState([])
   const [loading, setLoading] = useState(false)
   const [keywords, setKeywords] = useState('')
+  const [spinLoading, setSpinLoading] = useState(false)
 
   const aplayOpts = {
-    fixed: true,
-    mini: true,
+    fixed: false,
+    mini: false,
     volume: 1,
     autoplay: false,
     audio: [
       {
         name: 'Hotel California',
         artist: 'Eagles',
-        url: 'http://m7.music.126.net/20210817114236/8f2a70bf247dbae5b2fbea123d9e4fe9/ymusic/6aaa/8a6d/3f43/efef121449ef512bc6b7954b6bb95ef4.flac',
-        cover: 'http://p4.music.126.net/m_HGFCoSwhJYcJjgVaiq7A==/109951165261316702.jpg?param=200y200'
+        url: '//q.265265.xyz/audio/Hotel-California-Eagles.flac',
+        cover: '//p4.music.126.net/m_HGFCoSwhJYcJjgVaiq7A==/109951165261316702.jpg?param=200y200'
       }
     ]
   };
@@ -46,7 +47,6 @@ export function SearchPage(props: any) {
   }
 
   function tableChange(params: any) {
-    console.log('table change', params)
     setPagination({
       current: params.current,
       pageSize: params.pageSize,
@@ -79,17 +79,25 @@ export function SearchPage(props: any) {
       aplayInstance.list.add([{
         name: data.name,
         artist: getAr(data.ar),
-        url: res.data.data[0].url,
-        cover: data.al.picUrl + '?param=200y200'
+        url: replaceUrl(res.data.data[0].url),
+        cover: replaceUrl(data.al.picUrl) + '?param=200y200'
       }]);
     })
   }
 
+  function replaceUrl(str: string | undefined) : string {
+    if (!str) return ''
+    return str.replace(/^.*:/, '')
+  }
+
   function downloadSong(id: number | string, data: any): void{
+    setSpinLoading(true)
     let name = data.name + '-' + getAr(data.ar)
     SearchService.getSongInfoById({id: id}).then(res => {
-      downloadFile(res.data[0].url, name)
-    })
+      downloadFile(replaceUrl(res.data.data[0].url), `${name}.${res.data.data[0].type}`)
+    }).catch(() => {
+      setSpinLoading(false)
+    });
   }
 
   /**
@@ -121,6 +129,7 @@ export function SearchPage(props: any) {
         // document.body.removeChild(a);
         // URL.revokeObjectURL(url);
       }
+      setSpinLoading(false)
     };
   }
 
@@ -140,7 +149,6 @@ export function SearchPage(props: any) {
 
   function aplayOnInit(ap: any) {
     aplayInstance = ap;
-    console.log('ap', aplayInstance)
   }
 
   function aplayOnPlay() {
@@ -151,38 +159,30 @@ export function SearchPage(props: any) {
 
   }
 
-  function toLogin() {
-    props.history.push('/login')
-  }
-
   const columns = [
     {
       title: '歌曲名',
       dataIndex: 'name',
       sorter: false,
-      render: (name:string) => name,
-      width: '20%',
+      render: (name:string) => name
     },
     {
       title: '歌手',
       dataIndex: 'ar',
       sorter: false,
-      render: (ar:arInterface[]) => getAr(ar),
-      width: '20%',
+      render: (ar:arInterface[]) => getAr(ar)
     },
     {
       title: '专辑',
       dataIndex: 'al',
       sorter: false,
-      render: (al:any) => al.name,
-      width: '20%',
+      render: (al:any) => al.name
     },
     {
       title: '时间',
       dataIndex: 'dt',
       sorter: false,
-      render: (dt:any) => formatTime(dt),
-      width: '20%',
+      render: (dt:any) => formatTime(dt)
     },
     {
       title: '操作',
@@ -193,44 +193,45 @@ export function SearchPage(props: any) {
           <span className="icon-w play-btn" onClick={() => playSong(id, item)}></span>
           <span className="icon-w icon-download" onClick={() => downloadSong(id, item)}></span>
         </div>
-      ),
-      width: '20%',
+      )
     },
   ]
 
   return (
     <Fragment>
       <LayoutTop />
-      <div className="tips-w">
-        <p className="tips">如果要获得高音质音乐，请先登录网易云音乐账号。</p>
-      </div>
-      <div className="search-w">
-        <div className="form">
-          <Search
-            placeholder="输入歌曲名搜索"
-            maxLength={20}
-            allowClear
-            enterButton="搜索"
-            size="large"
-            onSearch={onSearch}
-          />
-
+      <Spin spinning={spinLoading} tip={'下载中...'}>
+        <div className="tips-w">
+          <p className="tips">如果要获得高音质音乐，请先登录网易云音乐账号。</p>
         </div>
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          loading={loading}
-          pagination={pagination}
-          rowKey="id"
-          onChange={tableChange}
-        />
-        <ReactAplayer
-          {...aplayOpts}
-          onInit={aplayOnInit}
-          onPlay={aplayOnPlay}
-          onPause={aplayOnPause}
-        />
-      </div>
+        <div className="search-w">
+          <div className="form">
+            <Search
+              placeholder="输入歌曲名搜索"
+              maxLength={20}
+              allowClear
+              enterButton="搜索"
+              size="large"
+              onSearch={onSearch}
+            />
+
+          </div>
+          <Table
+            columns={columns}
+            dataSource={dataSource}
+            loading={loading}
+            pagination={pagination}
+            rowKey="id"
+            onChange={tableChange}
+          />
+          <ReactAplayer
+            {...aplayOpts}
+            onInit={aplayOnInit}
+            onPlay={aplayOnPlay}
+            onPause={aplayOnPause}
+          />
+        </div>
+      </Spin>
     </Fragment>
   )
 }

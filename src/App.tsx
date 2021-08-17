@@ -21,7 +21,8 @@ export default class App extends Component{
       <ConfigProvider locale={zhCN}>
         <Router basename={process.env.REACT_APP_PREFIX}>
           <Switch>
-            <Route path="/search" exact component={SearchPage} />
+            <Route path="/" exact component={SearchPage}/>
+            {/*<Route path="/search" exact component={SearchPage} />*/}
             <Route path="/login" exact component={LoginPage} />
             <Route path="*" component={E404Page}></Route>
           </Switch>
