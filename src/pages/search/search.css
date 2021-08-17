@@ -1,6 +1,19 @@
+.tips-w{
+  padding: 10px;
+  background-color: #e5e5e5;
+}
 .search-w{
   width: 900px;
   margin: 0 auto;
+  padding: 10px 0;
+}
+.search-w .form{
+  padding-bottom: 10px;
+}
+.tips{
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 0;
 }
 .flex{
   display: flex;

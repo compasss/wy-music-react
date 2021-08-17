@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { Input, Table, message } from 'antd';
+import React, { useState, Fragment } from "react";
+import { Input, Table, message, Button } from 'antd';
 import {SearchService} from "../../api/search";
 import './search.css';
 import { SearchParams, arInterface } from "../../api/types";
 import ReactAplayer from 'react-aplayer';
+import LayoutTop from "../../components/layout/top";
+
 const { Search } = Input;
 let aplayInstance: any = null;
 
-export function SearchPage() {
+export function SearchPage(props: any) {
 
   const [pagination, setPagination] = useState({current: 1, pageSize: 10, total: 0})
   const [dataSource, setDataSource] = useState([])
@@ -15,20 +17,29 @@ export function SearchPage() {
   const [keywords, setKeywords] = useState('')
 
   const aplayOpts = {
-    theme: '#F57F17',
     fixed: true,
+    mini: true,
     volume: 1,
-    listFolded: true
+    autoplay: false,
+    audio: [
+      {
+        name: 'Hotel California',
+        artist: 'Eagles',
+        url: 'http://m7.music.126.net/20210817114236/8f2a70bf247dbae5b2fbea123d9e4fe9/ymusic/6aaa/8a6d/3f43/efef121449ef512bc6b7954b6bb95ef4.flac',
+        cover: 'http://p4.music.126.net/m_HGFCoSwhJYcJjgVaiq7A==/109951165261316702.jpg?param=200y200'
+      }
+    ]
   };
 
   function onSearch(value: any) {
-    if (value.length < 1) {
+    let str = value.trim();
+    if (str.length < 1) {
       message.error('请输入歌曲名')
       return;
     }
-    setKeywords(value)
+    setKeywords(str)
     searchData({
-      keywords: value,
+      keywords: str,
       limit: pagination.pageSize,
       offset: (pagination.current - 1) * pagination.pageSize
     }, {current: 1, pageSize: 10, total: 0})
@@ -74,14 +85,12 @@ export function SearchPage() {
     })
   }
 
-  // function downloadSong(id: number | string, data: any): void{
-  //   let name = data.name + '-' + this.getAr(data.ar)
-  //   this.searchService.getSongInfoById(id).subscribe(
-  //     (res: any) => {
-  //       this.downloadFile(res.data[0].url, name)
-  //     }
-  //   )
-  // }
+  function downloadSong(id: number | string, data: any): void{
+    let name = data.name + '-' + getAr(data.ar)
+    SearchService.getSongInfoById({id: id}).then(res => {
+      downloadFile(res.data[0].url, name)
+    })
+  }
 
   /**
    * 下载文件
@@ -142,6 +151,10 @@ export function SearchPage() {
 
   }
 
+  function toLogin() {
+    props.history.push('/login')
+  }
+
   const columns = [
     {
       title: '歌曲名',
@@ -178,7 +191,7 @@ export function SearchPage() {
       render: (id: number, item: any) => (
         <div className="flex">
           <span className="icon-w play-btn" onClick={() => playSong(id, item)}></span>
-          {/*<span className="icon-w icon-download" onClick={downloadSong(id)}></span>*/}
+          <span className="icon-w icon-download" onClick={() => downloadSong(id, item)}></span>
         </div>
       ),
       width: '20%',
@@ -186,31 +199,38 @@ export function SearchPage() {
   ]
 
   return (
-    <div className="search-w">
-      <div className="form">
-        <Search
-          placeholder="请输入歌曲名"
-          maxLength={20}
-          allowClear
-          enterButton="搜索"
-          size="large"
-          onSearch={onSearch}
+    <Fragment>
+      <LayoutTop />
+      <div className="tips-w">
+        <p className="tips">如果要获得高音质音乐，请先登录网易云音乐账号。</p>
+      </div>
+      <div className="search-w">
+        <div className="form">
+          <Search
+            placeholder="输入歌曲名搜索"
+            maxLength={20}
+            allowClear
+            enterButton="搜索"
+            size="large"
+            onSearch={onSearch}
+          />
+
+        </div>
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          loading={loading}
+          pagination={pagination}
+          rowKey="id"
+          onChange={tableChange}
+        />
+        <ReactAplayer
+          {...aplayOpts}
+          onInit={aplayOnInit}
+          onPlay={aplayOnPlay}
+          onPause={aplayOnPause}
         />
       </div>
-      <Table
-        columns={columns}
-        dataSource={dataSource}
-        loading={loading}
-        pagination={pagination}
-        rowKey="id"
-        onChange={tableChange}
-      ></Table>
-      <ReactAplayer
-        {...aplayOpts}
-        onInit={aplayOnInit}
-        onPlay={aplayOnPlay}
-        onPause={aplayOnPause}
-      />
-    </div>
+    </Fragment>
   )
 }

@@ -80,6 +80,7 @@ service.interceptors.request.use((config: AxiosRequestConfig) => {
   if(token){
     if (!config.params) config.params = {}
     config.params.cookie = `${token}`;
+    config.params.hash = uuidv4();
   }
   return config
 }, (error) => {
@@ -115,5 +116,16 @@ service.interceptors.response.use((response: AxiosResponse) => {
   }
   return Promise.reject(error)
 })
+
+/**
+ * RFC4122 version 4
+ * create uuid
+ */
+function uuidv4() : string {
+  return 'xxxxxxxxxxxxxxxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    let r = Math.random() * 16 | 0, v = c === 'x' ? r : ((r & 0x3) | 0x8);
+    return v.toString(16);
+  });
+}
 
 export default service

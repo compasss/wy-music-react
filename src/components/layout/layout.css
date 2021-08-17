@@ -1,0 +1,14 @@
+.layout-top{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px;
+  background-color: #14ae67;
+}
+.top-icon{
+  width: 30px;
+  height: 30px;
+}
+.layout-top .txt{
+  color: #FFF;
+}

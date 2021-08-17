@@ -4,7 +4,8 @@ import {
   Switch,
   Route
 } from "react-router-dom";
-
+import { ConfigProvider } from 'antd';
+import zhCN from 'antd/lib/locale/zh_CN';
 import {SearchPage} from "./pages/search/search";
 import LoginPage from "./pages/login/login";
 import {E404Page} from "./pages/error/e404";
@@ -17,13 +18,16 @@ import './App.css';
 export default class App extends Component{
   render() {
     return (
-      <Router basename={process.env.REACT_APP_PREFIX}>
-        <Switch>
-          <Route path="/search" exact component={SearchPage} />
-          <Route path="/login" exact component={LoginPage} />
-          <Route path="*" component={E404Page}></Route>
-        </Switch>
-      </Router>
+      <ConfigProvider locale={zhCN}>
+        <Router basename={process.env.REACT_APP_PREFIX}>
+          <Switch>
+            <Route path="/search" exact component={SearchPage} />
+            <Route path="/login" exact component={LoginPage} />
+            <Route path="*" component={E404Page}></Route>
+          </Switch>
+        </Router>
+      </ConfigProvider>
+
     )
   }
 }
