@@ -40,3 +40,8 @@
 .icon-download:hover{
   background-position: -104px -174px;
 }
+.aplay-w{
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}

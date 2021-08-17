@@ -6,9 +6,10 @@ import {
 } from "react-router-dom";
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/lib/locale/zh_CN';
-import {SearchPage} from "./pages/search/search";
+import SearchPage from "./pages/search/search";
+import SearchListPage from "./pages/search/searchList";
 import LoginPage from "./pages/login/login";
-import {E404Page} from "./pages/error/e404";
+import E404Page from "./pages/error/e404";
 
 // import logo from './logo.svg';
 // import { Counter } from './features/counter/Counter';
@@ -22,7 +23,7 @@ export default class App extends Component{
         <Router basename={process.env.REACT_APP_PREFIX}>
           <Switch>
             <Route path="/" exact component={SearchPage}/>
-            {/*<Route path="/search" exact component={SearchPage} />*/}
+            <Route path="/search" exact component={SearchListPage} />
             <Route path="/login" exact component={LoginPage} />
             <Route path="*" component={E404Page}></Route>
           </Switch>

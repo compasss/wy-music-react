@@ -1,5 +1,5 @@
 import React, { useState, Fragment } from "react";
-import { Input, Table, message, Spin } from 'antd';
+import {Avatar, Input, List, message, Skeleton, Spin} from 'antd';
 import {SearchService} from "../../api/search";
 import './search.css';
 import { SearchParams, arInterface } from "../../api/types";
@@ -9,17 +9,18 @@ import LayoutTop from "../../components/layout/top";
 const { Search } = Input;
 let aplayInstance: any = null;
 
-export default function SearchPage(props: any) {
+export default function SearchListPage(props: any) {
 
   const [pagination, setPagination] = useState({current: 1, pageSize: 10, total: 0})
   const [dataSource, setDataSource] = useState([])
   const [loading, setLoading] = useState(false)
   const [keywords, setKeywords] = useState('')
   const [spinLoading, setSpinLoading] = useState(false)
+  const [loadMore, setLoadMore] = useState(false)
 
   const aplayOpts = {
-    fixed: true,
-    mini: true,
+    fixed: false,
+    mini: false,
     volume: 1,
     autoplay: false,
     audio: [
@@ -159,44 +160,6 @@ export default function SearchPage(props: any) {
 
   }
 
-  const columns = [
-    {
-      title: '歌曲名',
-      dataIndex: 'name',
-      sorter: false,
-      render: (name:string) => name
-    },
-    {
-      title: '歌手',
-      dataIndex: 'ar',
-      sorter: false,
-      render: (ar:arInterface[]) => getAr(ar)
-    },
-    {
-      title: '专辑',
-      dataIndex: 'al',
-      sorter: false,
-      render: (al:any) => al.name
-    },
-    {
-      title: '时间',
-      dataIndex: 'dt',
-      sorter: false,
-      render: (dt:any) => formatTime(dt)
-    },
-    {
-      title: '操作',
-      dataIndex: 'id',
-      sorter: false,
-      render: (id: number, item: any) => (
-        <div className="flex">
-          <span className="icon-w play-btn" onClick={() => playSong(id, item)}></span>
-          <span className="icon-w icon-download" onClick={() => downloadSong(id, item)}></span>
-        </div>
-      )
-    },
-  ]
-
   return (
     <Fragment>
       <LayoutTop />
@@ -216,20 +179,40 @@ export default function SearchPage(props: any) {
             />
 
           </div>
-          <Table
-            columns={columns}
-            dataSource={dataSource}
+          <List
+            className="demo-loadmore-list"
             loading={loading}
-            pagination={pagination}
-            rowKey="id"
-            onChange={tableChange}
+            itemLayout="horizontal"
+            loadMore={loadMore}
+            dataSource={dataSource}
+            renderItem={(item:any) => (
+              <List.Item
+                actions={[<div className="flex">
+                  <span className="icon-w play-btn" onClick={() => playSong(item.id, item)}></span>
+                  <span className="icon-w icon-download" onClick={() => downloadSong(item.id, item)}></span>
+                </div>]}
+              >
+                <Skeleton avatar title={false} loading={item.loading} active>
+                  <List.Item.Meta
+                    avatar={
+                      <Avatar src={item.al.picUrl} />
+                    }
+                    title={<span>{item.name}</span>}
+                    description={<div><span className="m-r-10">{getAr(item.ar)}</span><span>{item.al.name}</span></div>}
+                  />
+                  <div>{formatTime(item.dt)}</div>
+                </Skeleton>
+              </List.Item>
+            )}
           />
-          <ReactAplayer
-            {...aplayOpts}
-            onInit={aplayOnInit}
-            onPlay={aplayOnPlay}
-            onPause={aplayOnPause}
-          />
+          <div className="aplay-w">
+            <ReactAplayer
+              {...aplayOpts}
+              onInit={aplayOnInit}
+              onPlay={aplayOnPlay}
+              onPause={aplayOnPause}
+            />
+          </div>
         </div>
       </Spin>
     </Fragment>
